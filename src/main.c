@@ -163,8 +163,10 @@ int main(int argc, char* argv[])
         frame_buffer.char_value[x_pos-1][ 7] = '/';
         frame_buffer.char_value[x_pos+1][ 7] = '\\';
 
-        if(rand() % 20 == 1)
+        if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
             ++x_pos;
+        if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            --x_pos;
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
