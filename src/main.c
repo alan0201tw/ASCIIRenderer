@@ -1,16 +1,17 @@
-#define STB_TRUETYPE_IMPLEMENTATION
-#include "stb_truetype.h"
-
-#include "glad/glad.h"
-
-#include <GLFW/glfw3.h>
-
-#include "linmath.h"
-
 #include <stdio.h>
 #include <string.h>
+// stb_truetype
+#define STB_TRUETYPE_IMPLEMENTATION
+#include "stb_truetype.h"
+// opengl : glad and glfw
+#include "glad/glad.h"
+#include <GLFW/glfw3.h>
+// vector library
+#include "linmath.h"
 
-#include "frame_buffer.h"
+#include "common.h"
+#include "framebuffer.h"
+#include "character.h"
 
 // static variables
 static stbtt_bakedchar cdata[96]; // ASCII 32..126 is 95 glyphs
@@ -140,6 +141,11 @@ int main(int argc, char* argv[])
 
     stbtt_init();
 
+
+    humanoid_t mainCharacter;
+    mainCharacter.m_position[0] = 10.0f;
+    mainCharacter.m_position[1] =  9.0f;
+
     while (!glfwWindowShouldClose(window))
     {
         for(size_t i = 0; i < FRAME_BUFFER_WIDTH; ++i)
@@ -153,20 +159,16 @@ int main(int argc, char* argv[])
             }
         }
 
-        static size_t x_pos = 10;
-
-        frame_buffer.char_value[x_pos][10] = 'o';
-        frame_buffer.char_value[x_pos][ 9] = 'l';
-        frame_buffer.char_value[x_pos-1][ 9] = '/';
-        frame_buffer.char_value[x_pos+1][ 9] = '\\';
-        frame_buffer.char_value[x_pos][ 8] = 'l';
-        frame_buffer.char_value[x_pos-1][ 7] = '/';
-        frame_buffer.char_value[x_pos+1][ 7] = '\\';
-
         if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            ++x_pos;
+            ++mainCharacter.m_position[0];
         if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            --x_pos;
+            --mainCharacter.m_position[0];
+        if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            ++mainCharacter.m_position[1];
+        if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            --mainCharacter.m_position[1];
+
+        render_humanoid(&frame_buffer, &mainCharacter);
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
