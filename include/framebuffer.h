@@ -35,4 +35,8 @@ void fb_write_char(frame_buffer_t* fb, size_t x, size_t y, char pixel)
         return;
     
     fb->char_value[x][y] = pixel;
+
+    fb->color_value[x][y][0] = 1.0f;
+    fb->color_value[x][y][1] = 0.0f;
+    fb->color_value[x][y][2] = 0.0f;
 }

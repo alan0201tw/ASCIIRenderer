@@ -97,6 +97,8 @@ void stbtt_render()
             pos[2] = (pos[2] - mid_y) * 0.9f + mid_y;
             pos[3] = (pos[3] - mid_y) * 0.9f + mid_y;
 
+            glColor3fv(frame_buffer.color_value[i][j]);
+
             glTexCoord2f(font_texture_uv[0],font_texture_uv[3]);
             glVertex2f(pos[0],pos[2]);
             glTexCoord2f(font_texture_uv[2],font_texture_uv[3]);
@@ -155,7 +157,12 @@ int main(int argc, char* argv[])
                 frame_buffer.char_value[i][j] = ' ';
 
                 if(i + j > 21 && i + j < 80 && j > 30)
+                {
                     frame_buffer.char_value[i][j] = 'a';
+                    frame_buffer.color_value[i][j][0] = 1.0f;
+                    frame_buffer.color_value[i][j][1] = 1.0f;
+                    frame_buffer.color_value[i][j][2] = 1.0f;
+                }
             }
         }
 
