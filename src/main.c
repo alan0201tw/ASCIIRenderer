@@ -150,21 +150,7 @@ int main(int argc, char* argv[])
 
     while (!glfwWindowShouldClose(window))
     {
-        for(size_t i = 0; i < FRAME_BUFFER_WIDTH; ++i)
-        {
-            for(size_t j = 0; j < FRAME_BUFFER_HEIGHT; ++j)
-            {
-                frame_buffer.char_value[i][j] = ' ';
-
-                if(i + j > 21 && i + j < 80 && j > 30)
-                {
-                    frame_buffer.char_value[i][j] = 'a';
-                    frame_buffer.color_value[i][j][0] = 1.0f;
-                    frame_buffer.color_value[i][j][1] = 1.0f;
-                    frame_buffer.color_value[i][j][2] = 1.0f;
-                }
-            }
-        }
+        fb_clear_frame_buffer(&frame_buffer);
 
         if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
             ++mainCharacter.m_position[0];
