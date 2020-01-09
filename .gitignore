@@ -1,3 +1,11 @@
 .vscode/*
 main
 bin/*
+
+# visual studio files
+bin-int/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+.vs/

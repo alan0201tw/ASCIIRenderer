@@ -16,7 +16,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 project "AsciiRenderer"
     location "."
     kind "ConsoleApp"
-    language "C++"
+    language "C"
     staticruntime "off"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -24,8 +24,8 @@ project "AsciiRenderer"
     
     files
     {
-        "include/**.hpp",
-        "src/**.cpp"
+        "include/**.h",
+        "src/**.c"
     }
 
     includedirs
@@ -36,14 +36,17 @@ project "AsciiRenderer"
 
     libdirs
     {
+        "vendor/lib"
     }
 
     links
     {
+        "glfw3.lib"
     }
 
     postbuildcommands
     {
+        -- ("{COPY}   \"vendor/dll/x64/freeglut.dll\"   \"bin/" .. outputdir .. "/%{prj.name}/\"")
     }
 
     -- everything under this filter only applies to windows

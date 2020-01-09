@@ -39,8 +39,11 @@ void get_uv_by_char(vec4 out_vec4, const stbtt_bakedchar *chardata, const char c
 
 void stbtt_init(void)
 {
-    unsigned char ttf_buffer[1 << 20];
-    unsigned char bitmap[512 * 512];
+    //unsigned char ttf_buffer[1 << 20];
+    //unsigned char bitmap[512 * 512];
+
+	unsigned char* ttf_buffer = (unsigned char*)malloc((1 << 20) * sizeof(unsigned char));
+	unsigned char* bitmap = (unsigned char*)malloc((512 * 512) * sizeof(unsigned char));
 
     FILE* font_file = fopen("./resources/clacon.ttf", "rb");
     size_t fread_size = fread(ttf_buffer, 1, 1 << 20, font_file);
@@ -54,6 +57,9 @@ void stbtt_init(void)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 512, 512, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap);
     // can free temp_bitmap at this point
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	free(ttf_buffer);
+	free(bitmap);
 }
 
 // this reads the entire frame_buffer and render it on the screen
@@ -76,7 +82,7 @@ void stbtt_render()
             if(value >= 128 || value < 32)
             {
                 printf("SYS : frame_buffer contains control character at "
-                "i = %ld, j = %ld \n", i, j);
+                "i = %zd, j = %zd \n", i, j);
                 continue;
             }
 
@@ -123,7 +129,7 @@ int main(int argc, char* argv[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     window = glfwCreateWindow(
-        screen_width, screen_height, "Simple example", NULL, NULL);
+        (int)screen_width, (int)screen_height, "Simple example", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
