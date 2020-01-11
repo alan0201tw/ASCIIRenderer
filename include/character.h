@@ -1,10 +1,12 @@
 #pragma once
 
+#include "transform.h"
+
 #include "framebuffer.h"
 
 typedef struct
 {
-    vec2 m_position;
+    transform_t m_transform;
 
 } humanoid_t;
 

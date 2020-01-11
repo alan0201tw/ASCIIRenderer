@@ -18,4 +18,4 @@ typedef struct
 
 
 void fb_clear_frame_buffer(frame_buffer_t* fb);
-void fb_write_char(frame_buffer_t* fb, size_t x, size_t y, char pixel);
+void fb_write_char(frame_buffer_t* fb, size_t x, size_t y, float depth, vec3 color, char pixel);

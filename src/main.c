@@ -155,8 +155,10 @@ int main(int argc, char* argv[])
 
 
     humanoid_t mainCharacter;
-    mainCharacter.m_position[0] = 10.0f;
-    mainCharacter.m_position[1] =  9.0f;
+    mainCharacter.m_transform.m_position[0] = 10.0f;
+    mainCharacter.m_transform.m_position[1] =  9.0f;
+    // depth
+    mainCharacter.m_transform.m_position[2] =  3.0f;
 
     clock_t previousFrameStartTime = clock();
 
@@ -169,14 +171,25 @@ int main(int argc, char* argv[])
 
         fb_clear_frame_buffer(&frame_buffer);
 
+        for(size_t idx = 0; idx < 10; ++idx)
+        {
+            vec3 col = {(float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX};
+
+            fb_write_char(&frame_buffer, rand()%50, rand()%50, 5, col, 'a');
+        }
+
+        const float velocity = 3.0f;
+
         if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            mainCharacter.m_position[0] += deltaTime * 3.0f;
+            mainCharacter.m_transform.m_position[0] += deltaTime * velocity;
         if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            mainCharacter.m_position[0] += deltaTime * -1 * 3.0f;
+            mainCharacter.m_transform.m_position[0] += deltaTime * -1 * velocity;
         if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            mainCharacter.m_position[1] += deltaTime * 3.0f;
+            mainCharacter.m_transform.m_position[1] += deltaTime * velocity;
         if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            mainCharacter.m_position[1] += deltaTime * -1 * 3.0f;
+            mainCharacter.m_transform.m_position[1] += deltaTime * -1 * velocity;
+
+        printf("deltaTime = %lf \n", deltaTime);
 
         render_humanoid(&frame_buffer, &mainCharacter);
 
