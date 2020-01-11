@@ -1,11 +1,15 @@
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
+
 // stb_truetype
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
+
 // opengl : glad and glfw
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
+
 // vector library
 #include "linmath.h"
 
@@ -129,7 +133,7 @@ int main(int argc, char* argv[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     window = glfwCreateWindow(
-        (int)screen_width, (int)screen_height, "Simple example", NULL, NULL);
+        (int)screen_width, (int)screen_height, "ASCIIRenderer", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -154,18 +158,25 @@ int main(int argc, char* argv[])
     mainCharacter.m_position[0] = 10.0f;
     mainCharacter.m_position[1] =  9.0f;
 
+    clock_t previousFrameStartTime = clock();
+
     while (!glfwWindowShouldClose(window))
     {
+        clock_t frameStartTime = clock();
+
+        const float deltaTime = (float)(frameStartTime - previousFrameStartTime) / CLOCKS_PER_SEC;
+        previousFrameStartTime = frameStartTime;
+
         fb_clear_frame_buffer(&frame_buffer);
 
         if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            ++mainCharacter.m_position[0];
+            mainCharacter.m_position[0] += deltaTime * 3.0f;
         if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            --mainCharacter.m_position[0];
+            mainCharacter.m_position[0] += deltaTime * -1 * 3.0f;
         if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            ++mainCharacter.m_position[1];
+            mainCharacter.m_position[1] += deltaTime * 3.0f;
         if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            --mainCharacter.m_position[1];
+            mainCharacter.m_position[1] += deltaTime * -1 * 3.0f;
 
         render_humanoid(&frame_buffer, &mainCharacter);
 

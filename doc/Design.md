@@ -11,7 +11,7 @@
 
 ```cpp
 
-struct Pedestrian
+struct Humanoid
 {
     char m_render_char[3][3];
 
@@ -20,3 +20,8 @@ struct Pedestrian
 }
 
 ```
+
+## Update 0111
+
+* Need a Transform class to determine the position and the depth of the characters
+* The frame buffer class should also support color and depth value writing
