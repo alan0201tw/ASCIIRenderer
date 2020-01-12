@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
             fb_write_char(&frame_buffer, rand()%50, rand()%50, 5, col, 'a');
         }
 
-        const float velocity = 3.0f;
+        const float velocity = 10.0f;
 
         if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
             mainCharacter.m_transform.m_position[0] += deltaTime * velocity;
@@ -189,7 +189,7 @@ int main(int argc, char* argv[])
         if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
             mainCharacter.m_transform.m_position[1] += deltaTime * -1 * velocity;
 
-        printf("deltaTime = %lf \n", deltaTime);
+        // printf("deltaTime = %lf \n", deltaTime);
 
         render_humanoid(&frame_buffer, &mainCharacter);
 
