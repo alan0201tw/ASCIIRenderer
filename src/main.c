@@ -15,7 +15,7 @@
 
 #include "common.h"
 #include "framebuffer.h"
-#include "character.h"
+#include "textsprite.h"
 
 // static variables
 static stbtt_bakedchar cdata[96]; // ASCII 32..126 is 95 glyphs
@@ -99,15 +99,15 @@ void stbtt_render()
             pos[2] = (float)(-screen_height_float / 2.0f + j * y_interval);
             pos[3] = (float)(pos[2] + y_interval);
 
-            // const float rescaleRatio = 0.95f;
+            const float rescaleRatio = 0.95f;
 
-            // float mid_x = 0.5f * (pos[0] + pos[1]);
-            // pos[0] = (pos[0] - mid_x) * rescaleRatio + mid_x;
-            // pos[1] = (pos[1] - mid_x) * rescaleRatio + mid_x;
+            float mid_x = 0.5f * (pos[0] + pos[1]);
+            pos[0] = (pos[0] - mid_x) * rescaleRatio + mid_x;
+            pos[1] = (pos[1] - mid_x) * rescaleRatio + mid_x;
 
-            // float mid_y = 0.5f * (pos[2] + pos[3]);
-            // pos[2] = (pos[2] - mid_y) * rescaleRatio + mid_y;
-            // pos[3] = (pos[3] - mid_y) * rescaleRatio + mid_y;
+            float mid_y = 0.5f * (pos[2] + pos[3]);
+            pos[2] = (pos[2] - mid_y) * rescaleRatio + mid_y;
+            pos[3] = (pos[3] - mid_y) * rescaleRatio + mid_y;
 
             glColor3fv(frame_buffer.color_value[i][j]);
 
@@ -155,19 +155,25 @@ int main(int argc, char* argv[])
 
     stbtt_init();
 
-
-    humanoid_t mainCharacter;
-    mainCharacter.m_transform.m_position[0] = 10.0f;
-    mainCharacter.m_transform.m_position[1] =  9.0f;
-    // depth
-    mainCharacter.m_transform.m_position[2] =  3.0f;
-
     clock_t previousFrameStartTime = clock();
-
-
 
     frame_buffer.center[0] = 0.0f;
     frame_buffer.center[1] = 0.0f;
+
+    text_sprite_t humanoidSprite;
+    humanoidSprite.m_transform.m_position[0] = 10.0f;
+    humanoidSprite.m_transform.m_position[1] =  9.0f;
+    // depth
+    humanoidSprite.m_transform.m_position[2] =  3.0f;
+    create_text_sprite(&humanoidSprite, "./resources/texts/humanoid.txt");
+
+    // printf("w = %ld \n", humanoidSprite.rowCount);
+    // for(size_t rowIdx = 0; rowIdx < humanoidSprite.rowCount; ++rowIdx)
+    // {
+    //     printf("\ncolumnCountEachRow[%ld] = %ld \n", rowIdx, humanoidSprite.columnCountEachRow[rowIdx]);
+    //     for(size_t colIdx = 0; colIdx < humanoidSprite.columnCountEachRow[rowIdx]; ++colIdx)
+    //         printf("content[%ld][%ld] = %c", rowIdx, colIdx, humanoidSprite.content[rowIdx][colIdx]);
+    // }
 
     while (!glfwWindowShouldClose(window))
     {
@@ -188,17 +194,18 @@ int main(int argc, char* argv[])
         const float velocity = 10.0f;
 
         if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            mainCharacter.m_transform.m_position[0] += deltaTime * velocity;
+            humanoidSprite.m_transform.m_position[0] += deltaTime * velocity;
         if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            mainCharacter.m_transform.m_position[0] += deltaTime * -1 * velocity;
+            humanoidSprite.m_transform.m_position[0] += deltaTime * -1 * velocity;
         if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            mainCharacter.m_transform.m_position[1] += deltaTime * velocity;
+            humanoidSprite.m_transform.m_position[1] += deltaTime * velocity;
         if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            mainCharacter.m_transform.m_position[1] += deltaTime * -1 * velocity;
+            humanoidSprite.m_transform.m_position[1] += deltaTime * -1 * velocity;
 
         // printf("deltaTime = %lf \n", deltaTime);
 
-        render_humanoid(&frame_buffer, &mainCharacter);
+        // render_humanoid(&frame_buffer, &mainCharacter);
+        render_text_sprite(&frame_buffer, &humanoidSprite);
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
