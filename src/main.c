@@ -162,6 +162,11 @@ int main(int argc, char* argv[])
 
     clock_t previousFrameStartTime = clock();
 
+
+
+    frame_buffer.center[0] = 0.0f;
+    frame_buffer.center[1] = 0.0f;
+
     while (!glfwWindowShouldClose(window))
     {
         clock_t frameStartTime = clock();
@@ -216,6 +221,12 @@ int main(int argc, char* argv[])
             look_up
             );
         glLoadMatrixf((const GLfloat*) &view_matrix);
+
+        // TODO : center affecting write char api
+        if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+            frame_buffer.center[0] += deltaTime * velocity;
+        if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+            frame_buffer.center[1] += deltaTime * velocity;
 
         glPushMatrix();
         {

@@ -21,6 +21,10 @@ void fb_clear_frame_buffer(frame_buffer_t* fb)
 
 void fb_write_char(frame_buffer_t* fb, size_t x, size_t y, float depth, vec3 color, char pixel)
 {
+    // Do transformation to camera space
+    x = x - (size_t)fb->center[0];
+    y = y - (size_t)fb->center[1];
+
     // view culling
     if(x < 0 || x >= FRAME_BUFFER_WIDTH || y < 0 || y >= FRAME_BUFFER_HEIGHT)
         return;

@@ -14,6 +14,11 @@ typedef struct
     // use this to perform depth test
     float depth_value[FRAME_BUFFER_WIDTH][FRAME_BUFFER_HEIGHT];
 
+    // combine camera information along in the frame_buffer_t type
+    // for a 2D ortho camera that will not rotate, using a vec2 to represent
+    // camera center is sufficient
+    vec2 center;
+
 } frame_buffer_t;
 
 
