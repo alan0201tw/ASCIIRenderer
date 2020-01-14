@@ -99,13 +99,15 @@ void stbtt_render()
             pos[2] = (float)(-screen_height_float / 2.0f + j * y_interval);
             pos[3] = (float)(pos[2] + y_interval);
 
-            float mid_x = 0.5f * (pos[0] + pos[1]);
-            pos[0] = (pos[0] - mid_x) * 0.9f + mid_x;
-            pos[1] = (pos[1] - mid_x) * 0.9f + mid_x;
+            // const float rescaleRatio = 0.95f;
 
-            float mid_y = 0.5f * (pos[2] + pos[3]);
-            pos[2] = (pos[2] - mid_y) * 0.9f + mid_y;
-            pos[3] = (pos[3] - mid_y) * 0.9f + mid_y;
+            // float mid_x = 0.5f * (pos[0] + pos[1]);
+            // pos[0] = (pos[0] - mid_x) * rescaleRatio + mid_x;
+            // pos[1] = (pos[1] - mid_x) * rescaleRatio + mid_x;
+
+            // float mid_y = 0.5f * (pos[2] + pos[3]);
+            // pos[2] = (pos[2] - mid_y) * rescaleRatio + mid_y;
+            // pos[3] = (pos[3] - mid_y) * rescaleRatio + mid_y;
 
             glColor3fv(frame_buffer.color_value[i][j]);
 
