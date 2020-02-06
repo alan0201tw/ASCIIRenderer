@@ -25,3 +25,10 @@ struct Humanoid
 
 * Need a Transform class to determine the position and the depth of the characters
 * The frame buffer class should also support color and depth value writing
+
+## Update 0206
+
+* Need an animation system to animate different states of animator
+    * Support state transition
+    * Each state consists of seveeral key-frames, it should be a dictionary of frame-number and character sprite, and maintain a "current frame" member
+        * Each frame we increase the "current frame" counter and if it passes a key-frame, replace the sprite pointer
