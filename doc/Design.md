@@ -32,3 +32,18 @@ struct Humanoid
     * Support state transition
     * Each state consists of seveeral key-frames, it should be a dictionary of frame-number and character sprite, and maintain a "current frame" member
         * Each frame we increase the "current frame" counter and if it passes a key-frame, replace the sprite pointer
+
+* Need serious re-factoring
+    * Use universal C-style naming and coding style
+        * Like... typedef struct makes an anonymous struct, perhaps replace it?
+        * use camelCase or snake_case?
+        * ...
+        ```
+        Discussion : 
+            * glfw uses camelCase for its function, like : glfwSetErrorCallback, glfwInit
+            * stb, linmath.h uses snake_case : stbtt_bakedchar, stbtt_init, size_t, vec3_mul_cross
+            * C standard library basically uses some snake_case and sometimes without underscore
+            * From snake_case wiki : https://en.wikipedia.org/wiki/Snake_case
+            * C, for some type names in the standard library, but not for function names. (update : function names are like getchar, strcat, they are abbreviated)
+            * C++, for the standard library and Boost
+        ```

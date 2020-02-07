@@ -127,7 +127,7 @@ void stbtt_render()
 int main(int argc, char* argv[])
 {
     glfwSetErrorCallback(error_callback);
-
+    
     GLFWwindow* window;
     if (!glfwInit())
         exit(EXIT_FAILURE);
