@@ -40,10 +40,27 @@ struct Humanoid
         * ...
         ```
         Discussion : 
-            * glfw uses camelCase for its function, like : glfwSetErrorCallback, glfwInit
+            * glfw uses camelCase for its function, like : glfwSetErrorCallback, glfwInit, structs as "struct GLFWimage"
+            * From https://github.com/glfw/glfw/blob/master/include/GLFW/glfw3.h#L1770
             * stb, linmath.h uses snake_case : stbtt_bakedchar, stbtt_init, size_t, vec3_mul_cross
             * C standard library basically uses some snake_case and sometimes without underscore
             * From snake_case wiki : https://en.wikipedia.org/wiki/Snake_case
             * C, for some type names in the standard library, but not for function names. (update : function names are like getchar, strcat, they are abbreviated)
             * C++, for the standard library and Boost
+
+        Conclusion :
+
+            1. Avoid using typedef on anonymous structs, separate struct definition and typedef, or use typedef struct NAME {...} NAME;
+
+            2. For structs, use camelCase with full caps prefix for project abbreviation
+
+                typedef struct ASCRframeBuffer
+                {...} ASCRframeBuffer;
+            
+            3. For functions, use camelCase with lower case prefix for project abbreviation and optional abbreviation of structs
+
+                void fb_clear_frame_buffer(frame_buffer_t* fb);
+                    will be changed to ...
+                void ascrFrameBufferClear(ASCRframeBuffer* fb);
+
         ```
