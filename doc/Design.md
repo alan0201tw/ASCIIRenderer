@@ -64,3 +64,6 @@ struct Humanoid
                 void ascrFrameBufferClear(ASCRframeBuffer* fb);
 
         ```
+
+* Separate stb utility and some opengl routines to helper functions
+

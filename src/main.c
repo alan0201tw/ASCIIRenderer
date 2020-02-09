@@ -43,9 +43,6 @@ void get_uv_by_char(vec4 out_vec4, const stbtt_bakedchar *chardata, const char c
 
 void stbtt_init(void)
 {
-    //unsigned char ttf_buffer[1 << 20];
-    //unsigned char bitmap[512 * 512];
-
 	unsigned char* ttf_buffer = (unsigned char*)malloc((1 << 20) * sizeof(unsigned char));
 	unsigned char* bitmap = (unsigned char*)malloc((512 * 512) * sizeof(unsigned char));
 
