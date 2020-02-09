@@ -2,7 +2,7 @@
 
 #include "transform.h"
 
-void fb_clear_frame_buffer(frame_buffer_t* fb)
+void ascrFrameBufferClear(ASCRframeBuffer* fb)
 {
     for(size_t i = 0; i < FRAME_BUFFER_WIDTH; ++i)
     {
@@ -19,7 +19,7 @@ void fb_clear_frame_buffer(frame_buffer_t* fb)
     }
 }
 
-void fb_write_char(frame_buffer_t* fb, size_t x, size_t y, float depth, vec3 color, char pixel)
+void ascrFrameBufferWriteChar(ASCRframeBuffer* fb, size_t x, size_t y, float depth, vec3 color, char pixel)
 {
     // Do transformation to camera space
     x = x - (size_t)fb->center[0];

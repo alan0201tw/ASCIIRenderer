@@ -4,7 +4,7 @@
 
 #include "linmath.h"
 
-typedef struct
+typedef struct ASCRframeBuffer
 {
     char char_value[FRAME_BUFFER_WIDTH][FRAME_BUFFER_HEIGHT];
     // record a normalized [0, 1) range color buffer
@@ -19,8 +19,8 @@ typedef struct
     // camera center is sufficient
     vec2 center;
 
-} frame_buffer_t;
+} ASCRframeBuffer;
 
 
-void fb_clear_frame_buffer(frame_buffer_t* fb);
-void fb_write_char(frame_buffer_t* fb, size_t x, size_t y, float depth, vec3 color, char pixel);
+void ascrFrameBufferClear(ASCRframeBuffer* fb);
+void ascrFrameBufferWriteChar(ASCRframeBuffer* fb, size_t x, size_t y, float depth, vec3 color, char pixel);

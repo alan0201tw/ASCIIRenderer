@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-void create_text_sprite(text_sprite_t* text_sprite, const char* const file_name)
+void ascrTextSpriteCreateFromFile(ASCRtextSprite* text_sprite, const char* const file_name)
 {
     FILE* file = fopen(file_name, "r");
     if(!file)
@@ -61,7 +61,7 @@ void create_text_sprite(text_sprite_t* text_sprite, const char* const file_name)
     fclose(file);
 }
 
-void render_text_sprite(frame_buffer_t* const target, const text_sprite_t* const text_sprite)
+void ascrTextSpriteRender(ASCRframeBuffer* const target, const ASCRtextSprite* const text_sprite)
 {
     vec2 position;
     position[0] = text_sprite->m_transform.m_position[0];
@@ -79,7 +79,7 @@ void render_text_sprite(frame_buffer_t* const target, const text_sprite_t* const
             // inverse y
             size_t char_position_y = (size_t)position[1] + (text_sprite->rowCount - rowIdx - 1);
 
-            fb_write_char(
+            ascrFrameBufferWriteChar(
                 target, char_position_x, char_position_y, depth, color,
                 text_sprite->content[rowIdx][colIdx]
                 );

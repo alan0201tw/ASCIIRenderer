@@ -20,7 +20,7 @@
 // static variables
 static stbtt_bakedchar cdata[96]; // ASCII 32..126 is 95 glyphs
 static GLuint ftex;
-static frame_buffer_t frame_buffer;
+static ASCRframeBuffer frameBuffer;
 
 static size_t screen_width = 640;
 static size_t screen_height = 480;
@@ -82,7 +82,7 @@ void stbtt_render()
     {
         for(size_t j = 0; j < FRAME_BUFFER_HEIGHT; ++j)
         {
-            char value = frame_buffer.char_value[i][j];
+            char value = frameBuffer.char_value[i][j];
             if(value >= 128 || value < 32)
             {
                 printf("SYS : frame_buffer contains control character at "
@@ -109,7 +109,7 @@ void stbtt_render()
             pos[2] = (pos[2] - mid_y) * rescaleRatio + mid_y;
             pos[3] = (pos[3] - mid_y) * rescaleRatio + mid_y;
 
-            glColor3fv(frame_buffer.color_value[i][j]);
+            glColor3fv(frameBuffer.color_value[i][j]);
 
             glTexCoord2f(font_texture_uv[0],font_texture_uv[3]);
             glVertex2f(pos[0],pos[2]);
@@ -157,15 +157,15 @@ int main(int argc, char* argv[])
 
     clock_t previousFrameStartTime = clock();
 
-    frame_buffer.center[0] = 0.0f;
-    frame_buffer.center[1] = 0.0f;
+    frameBuffer.center[0] = 0.0f;
+    frameBuffer.center[1] = 0.0f;
 
-    text_sprite_t humanoidSprite;
+    ASCRtextSprite humanoidSprite;
     humanoidSprite.m_transform.m_position[0] = 10.0f;
     humanoidSprite.m_transform.m_position[1] =  9.0f;
     // depth
     humanoidSprite.m_transform.m_position[2] =  3.0f;
-    create_text_sprite(&humanoidSprite, "./resources/texts/humanoid.txt");
+    ascrTextSpriteCreateFromFile(&humanoidSprite, "./resources/texts/humanoid.txt");
 
     // printf("w = %ld \n", humanoidSprite.rowCount);
     // for(size_t rowIdx = 0; rowIdx < humanoidSprite.rowCount; ++rowIdx)
@@ -182,13 +182,13 @@ int main(int argc, char* argv[])
         const float deltaTime = (float)(frameStartTime - previousFrameStartTime) / CLOCKS_PER_SEC;
         previousFrameStartTime = frameStartTime;
 
-        fb_clear_frame_buffer(&frame_buffer);
+        ascrFrameBufferClear(&frameBuffer);
 
         for(size_t idx = 0; idx < 10; ++idx)
         {
             vec3 col = {(float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX};
 
-            fb_write_char(&frame_buffer, rand()%50, rand()%50, 5, col, 'a');
+            ascrFrameBufferWriteChar(&frameBuffer, rand()%50, rand()%50, 5, col, 'a');
         }
 
         const float velocity = 10.0f;
@@ -205,7 +205,7 @@ int main(int argc, char* argv[])
         // printf("deltaTime = %lf \n", deltaTime);
 
         // render_humanoid(&frame_buffer, &mainCharacter);
-        render_text_sprite(&frame_buffer, &humanoidSprite);
+        ascrTextSpriteRender(&frameBuffer, &humanoidSprite);
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
@@ -233,9 +233,9 @@ int main(int argc, char* argv[])
 
         // TODO : center affecting write char api
         if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-            frame_buffer.center[0] += deltaTime * velocity;
+            frameBuffer.center[0] += deltaTime * velocity;
         if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-            frame_buffer.center[1] += deltaTime * velocity;
+            frameBuffer.center[1] += deltaTime * velocity;
 
         glPushMatrix();
         {

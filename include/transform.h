@@ -2,10 +2,10 @@
 
 #include "linmath.h"
 
-typedef struct
+typedef struct ASCRtransform
 {
     // x, y : the position in the scene / world
     // z    : the depth value to perform depth test
     vec3 m_position;
     
-} transform_t;
+} ASCRtransform;
