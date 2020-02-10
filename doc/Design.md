@@ -33,6 +33,28 @@ struct Humanoid
     * Each state consists of seveeral key-frames, it should be a dictionary of frame-number and character sprite, and maintain a "current frame" member
         * Each frame we increase the "current frame" counter and if it passes a key-frame, replace the sprite pointer
 
+	```
+	struct ASCRanimationClip
+	{
+		ASCRtextSprite [] sprites;
+	}
+
+	struct ASCRanimationStateTransition
+	{
+		typedef bool predicateFunction(...);
+		predicateFunction* predicate;
+	}
+
+	void CheckTransition() { ... }
+
+	struct ASCRanimationState
+	{
+		ASCRanimationClip clip;
+
+		ASCRanimationStateTransition [] transitions;
+	}
+	```
+
 * Need serious re-factoring
     * Use universal C-style naming and coding style
         * Like... typedef struct makes an anonymous struct, perhaps replace it?
@@ -67,3 +89,4 @@ struct Humanoid
 
 * Separate stb utility and some opengl routines to helper functions
 
+* Add dynamic array library for better utility
