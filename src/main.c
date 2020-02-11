@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <stdbool.h>
 
 // stb_truetype
 #define STB_TRUETYPE_IMPLEMENTATION
@@ -16,6 +17,7 @@
 #include "common.h"
 #include "framebuffer.h"
 #include "textsprite.h"
+#include "animation.h"
 
 // static variables
 static stbtt_bakedchar cdata[96]; // ASCII 32..126 is 95 glyphs
@@ -24,6 +26,8 @@ static ASCRframeBuffer frameBuffer;
 
 static size_t screen_width = 640;
 static size_t screen_height = 480;
+
+static size_t counter = 0;
 
 static void error_callback(int error, const char* description)
 {
@@ -121,6 +125,14 @@ void stbtt_render()
     glEnd();
 }
 
+bool samplePredicate()
+{
+    counter++;
+    if(counter > 200)
+        return true;
+    return false;
+}
+
 int main(int argc, char* argv[])
 {
     glfwSetErrorCallback(error_callback);
@@ -157,20 +169,40 @@ int main(int argc, char* argv[])
     frameBuffer.center[0] = 0.0f;
     frameBuffer.center[1] = 0.0f;
 
-    ASCRtextSprite humanoidSprite;
-    humanoidSprite.m_transform.m_position[0] = 10.0f;
-    humanoidSprite.m_transform.m_position[1] =  9.0f;
+    ASCRtextSpriteEntity characterEntity;
+    characterEntity.transform.position[0] = 10.0f;
+    characterEntity.transform.position[1] =  9.0f;
     // depth
-    humanoidSprite.m_transform.m_position[2] =  3.0f;
-    ascrTextSpriteCreateFromFile(&humanoidSprite, "./resources/texts/humanoid.txt");
+    characterEntity.transform.position[2] =  3.0f;
 
-    // printf("w = %ld \n", humanoidSprite.rowCount);
-    // for(size_t rowIdx = 0; rowIdx < humanoidSprite.rowCount; ++rowIdx)
-    // {
-    //     printf("\ncolumnCountEachRow[%ld] = %ld \n", rowIdx, humanoidSprite.columnCountEachRow[rowIdx]);
-    //     for(size_t colIdx = 0; colIdx < humanoidSprite.columnCountEachRow[rowIdx]; ++colIdx)
-    //         printf("content[%ld][%ld] = %c", rowIdx, colIdx, humanoidSprite.content[rowIdx][colIdx]);
-    // }
+    ASCRtextSprite* idleSprite = (ASCRtextSprite*) malloc(sizeof(ASCRtextSprite));
+    ascrTextSpriteCreateFromFile(idleSprite, "./resources/texts/humanoid.txt");
+    ASCRtextSprite* walkingSprite = (ASCRtextSprite*) malloc(sizeof(ASCRtextSprite));
+    ascrTextSpriteCreateFromFile(walkingSprite, "./resources/texts/humanoid_walking.txt");
+
+    ASCRanimationState characterIdle, characterWalking;
+    ascrAnimationStateInit(&characterIdle);
+    ascrAnimationStateInit(&characterWalking);
+
+    ASCRanimationState* currentState = &characterIdle;
+
+    ASCRanimationClip idleClip, walkingClip;
+    ascrAnimationClipInit(&idleClip);
+    ascrAnimationClipInit(&walkingClip);
+    vec_push(&idleClip.sprites, *idleSprite);
+    vec_push(&walkingClip.sprites, *walkingSprite);
+    	
+    characterIdle.clip = idleClip;
+    characterWalking.clip = walkingClip;
+    
+    ASCRanimationStateTransition transition;
+    transition.predicate = samplePredicate;
+    transition.targetState = &characterWalking;
+    
+    vec_push(
+    	&characterIdle.transitions,
+    	transition
+    );
 
     while (!glfwWindowShouldClose(window))
     {
@@ -178,6 +210,25 @@ int main(int argc, char* argv[])
 
         const float deltaTime = (float)(frameStartTime - previousFrameStartTime) / CLOCKS_PER_SEC;
         previousFrameStartTime = frameStartTime;
+
+        // Update
+
+        currentState = ascrAnimationStateTransitionUpdate(
+            currentState,
+            &transition
+        );
+
+        if(currentState == &characterIdle)
+        {
+            printf("currentState == &characterIdle \n");
+        }
+        else if(currentState == &characterWalking)
+        {
+            printf("currentState == &characterWalking \n");
+        }
+        characterEntity.textSprite = &(currentState->clip.sprites.data[0]);
+
+        //
 
         ascrFrameBufferClear(&frameBuffer);
 
@@ -191,18 +242,18 @@ int main(int argc, char* argv[])
         const float velocity = 10.0f;
 
         if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            humanoidSprite.m_transform.m_position[0] += deltaTime * velocity;
+            characterEntity.transform.position[0] += deltaTime * velocity;
         if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            humanoidSprite.m_transform.m_position[0] += deltaTime * -1 * velocity;
+            characterEntity.transform.position[0] += deltaTime * -1 * velocity;
         if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            humanoidSprite.m_transform.m_position[1] += deltaTime * velocity;
+            characterEntity.transform.position[1] += deltaTime * velocity;
         if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            humanoidSprite.m_transform.m_position[1] += deltaTime * -1 * velocity;
+            characterEntity.transform.position[1] += deltaTime * -1 * velocity;
 
         // printf("deltaTime = %lf \n", deltaTime);
 
         // render_humanoid(&frame_buffer, &mainCharacter);
-        ascrTextSpriteRender(&frameBuffer, &humanoidSprite);
+        ascrTextSpriteEntityRender(&frameBuffer, &characterEntity);
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);

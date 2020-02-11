@@ -7,9 +7,10 @@
 
 #include "textsprite.h"
 
+struct ASCRanimationStateTransition;
+struct ASCRanimationState;
 
 typedef bool (*predicateFunction) ();
-
 typedef vec_t(ASCRtextSprite) ASCRtextSpriteVector;
 
 typedef struct ASCRanimationClip
@@ -21,7 +22,8 @@ typedef struct ASCRanimationClip
 
 typedef struct ASCRanimationStateTransition
 {
-	predicateFunction* predicate;
+	predicateFunction predicate;
+	struct ASCRanimationState* targetState;
 
 } ASCRanimationStateTransition;
 
@@ -33,3 +35,30 @@ typedef struct ASCRanimationState
 	ASCRanimationStateTransitionVector transitions;
 
 } ASCRanimationState;
+
+void ascrAnimationClipInit(ASCRanimationClip* clip);
+void ascrAnimationStateInit(ASCRanimationState* state);
+
+ASCRanimationState* ascrAnimationStateTransitionUpdate(
+    ASCRanimationState* state,
+    ASCRanimationStateTransition* transition);
+	
+/**
+ * 	Target Usage :
+ * 	
+ * 	ASCRanimationState characterIdle, characterWalking;
+ * 	ascrAnimationStateInit(&characterIdle);
+ * 	ascrAnimationStateInit(&characterWalking);
+ * 	
+ * 	characterIdle.clip = idleClip;
+ * 	characterWalking.clip = walkingClip;
+ * 
+ * 	ASCRanimationStateTransition transition;
+ * 	transition.predicate = someFunction;
+ * 	transition.targetState = &characterWalking;
+ * 
+ * 	vec_push(
+ * 		&characterIdle.transitions,
+ * 		transition
+ * 	)
+ */

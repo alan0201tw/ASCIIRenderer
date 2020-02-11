@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-void ascrTextSpriteCreateFromFile(ASCRtextSprite* text_sprite, const char* const file_name)
+void ascrTextSpriteCreateFromFile(ASCRtextSprite* textSprite, const char* const file_name)
 {
     FILE* file = fopen(file_name, "r");
     if(!file)
@@ -28,18 +28,18 @@ void ascrTextSpriteCreateFromFile(ASCRtextSprite* text_sprite, const char* const
     // this count variable should be 1 unit larger than the index
     rowCount += 1;
 
-    text_sprite->rowCount = rowCount;
-    text_sprite->columnCountEachRow = (size_t*)malloc(sizeof(size_t) * rowCount);
+    textSprite->rowCount = rowCount;
+    textSprite->columnCountEachRow = (size_t*)malloc(sizeof(size_t) * rowCount);
 
     // printf("rowCount = %ld \n", rowCount);
     // printf("text_sprite->rowCount = %ld \n", text_sprite->rowCount);
 
-    text_sprite->content = (char**)malloc(sizeof(char*) * rowCount);
+    textSprite->content = (char**)malloc(sizeof(char*) * rowCount);
     for(size_t rowIdx = 0; rowIdx < rowCount; ++rowIdx)
     {
         // printf("columnCountEachRow[%ld] = %ld \n", rowIdx, columnCountEachRow[rowIdx]);
-        text_sprite->columnCountEachRow[rowIdx] = columnCountEachRow[rowIdx];
-        text_sprite->content[rowIdx] = (char*)malloc(sizeof(char) * columnCountEachRow[rowIdx]);
+        textSprite->columnCountEachRow[rowIdx] = columnCountEachRow[rowIdx];
+        textSprite->content[rowIdx] = (char*)malloc(sizeof(char) * columnCountEachRow[rowIdx]);
     }
 
     size_t row = 0, col = 0;
@@ -53,7 +53,7 @@ void ascrTextSpriteCreateFromFile(ASCRtextSprite* text_sprite, const char* const
         }
         else if (c != '\r')
         {
-            text_sprite->content[row][col] = c;
+            textSprite->content[row][col] = c;
             ++col;
         }
     }
@@ -61,27 +61,27 @@ void ascrTextSpriteCreateFromFile(ASCRtextSprite* text_sprite, const char* const
     fclose(file);
 }
 
-void ascrTextSpriteRender(ASCRframeBuffer* const target, const ASCRtextSprite* const text_sprite)
+void ascrTextSpriteEntityRender(ASCRframeBuffer* const target, const ASCRtextSpriteEntity* const entity)
 {
     vec2 position;
-    position[0] = text_sprite->m_transform.m_position[0];
-    position[1] = text_sprite->m_transform.m_position[1];
+    position[0] = entity->transform.position[0];
+    position[1] = entity->transform.position[1];
     
-    float depth = text_sprite->m_transform.m_position[2];
+    float depth = entity->transform.position[2];
 
     vec3 color = {1.0f, 1.0f, 1.0f};
 
-    for(size_t rowIdx = 0; rowIdx < text_sprite->rowCount; ++rowIdx)
+    for(size_t rowIdx = 0; rowIdx < entity->textSprite->rowCount; ++rowIdx)
     {
-        for(size_t colIdx = 0; colIdx < text_sprite->columnCountEachRow[rowIdx]; ++colIdx)
+        for(size_t colIdx = 0; colIdx < entity->textSprite->columnCountEachRow[rowIdx]; ++colIdx)
         {
             size_t char_position_x = (size_t)position[0] + colIdx;
             // inverse y
-            size_t char_position_y = (size_t)position[1] + (text_sprite->rowCount - rowIdx - 1);
+            size_t char_position_y = (size_t)position[1] + (entity->textSprite->rowCount - rowIdx - 1);
 
             ascrFrameBufferWriteChar(
                 target, char_position_x, char_position_y, depth, color,
-                text_sprite->content[rowIdx][colIdx]
+                entity->textSprite->content[rowIdx][colIdx]
                 );
         }
     }
