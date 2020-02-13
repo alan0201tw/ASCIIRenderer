@@ -33,7 +33,7 @@ struct Humanoid
     * Each state consists of seveeral key-frames, it should be a dictionary of frame-number and character sprite, and maintain a "current frame" member
         * Each frame we increase the "current frame" counter and if it passes a key-frame, replace the sprite pointer
 
-	```
+	```cpp
 	struct ASCRanimationClip
 	{
 		ASCRtextSprite [] sprites;
@@ -90,3 +90,23 @@ struct Humanoid
 * Separate stb utility and some opengl routines to helper functions
 
 * Add dynamic array library for better utility
+
+# Update 0213
+
+* Need a good architecture to update animator, and for animator to update textSprites in entities
+
+```cpp
+typedef struct ASCRtextSpriteEntity
+{
+    ASCRtransform transform;
+    ASCRtextSprite* textSprite;
+
+    // added
+    ASCRanimationState* animatorState;
+    
+} ASCRtextSpriteEntity;
+```
+
+* Adding timer to State struct to do animation
+
+* States cannot be shared among instances of entity, either enforce this to not happen or at least do some documentation
