@@ -209,13 +209,15 @@ int main(int argc, char* argv[])
 
     while (!glfwWindowShouldClose(window))
     {
-        clock_t frameStartTime = clock();
+        // clear the frame buffer
+        ascrFrameBufferClear(&frameBuffer);
 
+        clock_t frameStartTime = clock();
         const float deltaTime = (float)(frameStartTime - previousFrameStartTime) / CLOCKS_PER_SEC;
         previousFrameStartTime = frameStartTime;
         // printf("deltaTime = %f \n", deltaTime);
-        // Update
 
+        // Update
         currentState = ascrAnimationStateTransitionUpdate(
             currentState,
             &transition
@@ -223,17 +225,20 @@ int main(int argc, char* argv[])
 
         if(currentState == &characterIdle)
         {
-            printf("currentState == &characterIdle \n");
+            // printf("currentState == &characterIdle \n");
         }
         else if(currentState == &characterWalking)
         {
-            printf("currentState == &characterWalking \n");
+            // printf("currentState == &characterWalking \n");
         }
         characterEntity.textSprite = &(currentState->clip.sprites.data[0]);
-
         //
-
-        ascrFrameBufferClear(&frameBuffer);
+        char sampleText[32];
+        sprintf(sampleText, "FPS = %f", 1.0f / deltaTime);
+        vec3 white = {1.0f, 1.0f, 1.0f};
+        ascrFrameBufferWriteStringScreenSpace(
+            &frameBuffer, 3, 3, 5, white, sampleText
+        );
 
         for(size_t idx = 0; idx < 10; ++idx)
         {
@@ -291,8 +296,6 @@ int main(int argc, char* argv[])
         glPushMatrix();
         {
             glColor3f(1.0f, 1.0f, 1.0f);
-            // frame_buffer.char_value[rand() % 50][rand() % 50] = 'U';
-            // frame_buffer.char_value[rand() % 50][rand() % 50] = ' ';
             stbtt_render();
         }
         glPopMatrix();

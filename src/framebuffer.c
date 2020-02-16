@@ -41,3 +41,20 @@ void ascrFrameBufferWriteChar(ASCRframeBuffer* fb, size_t x, size_t y, float dep
 
     fb->depth_value[x][y] = depth;
 }
+
+void ascrFrameBufferWriteCharScreenSpace(ASCRframeBuffer* fb, size_t x, size_t y, float depth, vec3 color, char pixel)
+{
+    ascrFrameBufferWriteChar(
+        fb, x + fb->center[0], y + fb->center[1], depth, color, pixel
+    );
+}
+
+void ascrFrameBufferWriteStringScreenSpace(ASCRframeBuffer* fb, size_t x, size_t y, float depth, vec3 color, char* pixels)
+{
+    for(size_t idx = 0; idx < strlen(pixels); ++idx)
+    {
+        ascrFrameBufferWriteCharScreenSpace(
+            fb, x + idx, y, depth, color, pixels[idx]
+        );
+    }
+}

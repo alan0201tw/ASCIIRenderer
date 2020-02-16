@@ -24,3 +24,5 @@ typedef struct ASCRframeBuffer
 
 void ascrFrameBufferClear(ASCRframeBuffer* fb);
 void ascrFrameBufferWriteChar(ASCRframeBuffer* fb, size_t x, size_t y, float depth, vec3 color, char pixel);
+void ascrFrameBufferWriteCharScreenSpace(ASCRframeBuffer* fb, size_t x, size_t y, float depth, vec3 color, char pixel);
+void ascrFrameBufferWriteStringScreenSpace(ASCRframeBuffer* fb, size_t x, size_t y, float depth, vec3 color, char* pixels);
