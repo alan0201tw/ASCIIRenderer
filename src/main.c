@@ -27,6 +27,12 @@ static ASCRframeBuffer frameBuffer;
 
 static size_t screen_width = 640;
 static size_t screen_height = 480;
+static float screen_aspect_ratio;
+
+void init()
+{
+    screen_aspect_ratio = (float)screen_width / (float)screen_height; // w / h;
+}
 
 static size_t counter = 0;
 
@@ -96,10 +102,21 @@ void stbtt_render()
             get_uv_by_char(font_texture_uv, cdata, value);
 
             vec4 pos;
-            pos[0] = (float)(-screen_width_float / 2.0f + i * x_interval);
-            pos[1] = (float)(pos[0] + x_interval);
-            pos[2] = (float)(-screen_height_float / 2.0f + j * y_interval);
-            pos[3] = (float)(pos[2] + y_interval);
+
+            // TODO : place the text in the middle of the area
+
+            float textXInterval = (font_texture_uv[2] - font_texture_uv[0]);
+            float textYInterval = (font_texture_uv[3] - font_texture_uv[1]);
+
+            float halfWidth = 0.5f * 32.0f * screen_aspect_ratio * textXInterval * x_interval;
+            float halfHeight = 0.5f * 32.0f * textYInterval * y_interval;
+
+            // put the character in the middle of the area in X-axis
+            // and on bottom in Y-axis
+            pos[0] = (float)(-screen_width_float / 2.0f + (i+1) * x_interval - halfWidth);
+            pos[1] = (float)(pos[0] + 2.0f * halfWidth);
+            pos[2] = (float)(-screen_height_float / 2.0f + (j+1) * y_interval);
+            pos[3] = (float)(pos[2] + 2.0f * halfHeight);
 
             const float rescaleRatio = 0.95f;
 
@@ -136,6 +153,8 @@ bool samplePredicate()
 
 int main(int argc, char* argv[])
 {
+    init();
+
     glfwSetErrorCallback(error_callback);
     
     GLFWwindow* window;
@@ -215,7 +234,6 @@ int main(int argc, char* argv[])
         clock_t frameStartTime = clock();
         const float deltaTime = (float)(frameStartTime - previousFrameStartTime) / CLOCKS_PER_SEC;
         previousFrameStartTime = frameStartTime;
-        // printf("deltaTime = %f \n", deltaTime);
 
         // Update
         currentState = ascrAnimationStateTransitionUpdate(
@@ -238,6 +256,10 @@ int main(int argc, char* argv[])
         vec3 white = {1.0f, 1.0f, 1.0f};
         ascrFrameBufferWriteStringScreenSpace(
             &frameBuffer, 3, 3, 5, white, sampleText
+        );
+        sprintf(sampleText, "dT = %f", deltaTime);
+        ascrFrameBufferWriteStringScreenSpace(
+            &frameBuffer, 3, 5, 5, white, sampleText
         );
 
         for(size_t idx = 0; idx < 10; ++idx)
