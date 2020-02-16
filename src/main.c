@@ -25,8 +25,8 @@ static stbtt_bakedchar cdata[96]; // ASCII 32..126 is 95 glyphs
 static GLuint ftex;
 static ASCRframeBuffer frameBuffer;
 
-static size_t screen_width = 640;
-static size_t screen_height = 480;
+static int screen_width = 640;
+static int screen_height = 480;
 static float screen_aspect_ratio;
 
 void init()
@@ -113,9 +113,9 @@ void stbtt_render()
 
             // put the character in the middle of the area in X-axis
             // and on bottom in Y-axis
-            pos[0] = (float)(-screen_width_float / 2.0f + (i+1) * x_interval - halfWidth);
+            pos[0] = (float)(-screen_width_float / 2.0f + (i + 0.5f) * x_interval - halfWidth);
             pos[1] = (float)(pos[0] + 2.0f * halfWidth);
-            pos[2] = (float)(-screen_height_float / 2.0f + (j+1) * y_interval);
+            pos[2] = (float)(-screen_height_float / 2.0f + j * y_interval);
             pos[3] = (float)(pos[2] + 2.0f * halfHeight);
 
             const float rescaleRatio = 0.95f;
@@ -231,6 +231,12 @@ int main(int argc, char* argv[])
         // clear the frame buffer
         ascrFrameBufferClear(&frameBuffer);
 
+        int ww, wh;
+        glfwGetWindowSize(window, &ww, &wh);
+        screen_width = ww;
+        screen_height = wh;
+        screen_aspect_ratio = screen_width / screen_height;
+
         clock_t frameStartTime = clock();
         const float deltaTime = (float)(frameStartTime - previousFrameStartTime) / CLOCKS_PER_SEC;
         previousFrameStartTime = frameStartTime;
@@ -255,11 +261,11 @@ int main(int argc, char* argv[])
         sprintf(sampleText, "FPS = %f", 1.0f / deltaTime);
         vec3 white = {1.0f, 1.0f, 1.0f};
         ascrFrameBufferWriteStringScreenSpace(
-            &frameBuffer, 3, 3, 5, white, sampleText
+            &frameBuffer, 0, 0, 5, white, sampleText
         );
         sprintf(sampleText, "dT = %f", deltaTime);
         ascrFrameBufferWriteStringScreenSpace(
-            &frameBuffer, 3, 5, 5, white, sampleText
+            &frameBuffer, 0, 1, 5, white, sampleText
         );
 
         for(size_t idx = 0; idx < 10; ++idx)
@@ -293,7 +299,13 @@ int main(int argc, char* argv[])
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(-320, 320, -240, 240, 0.01f, 1000);
+        
+        glOrtho( 
+            - screen_width / 2, 
+              screen_width / 2, 
+            - screen_height / 2, 
+              screen_height / 2, 
+            0.01f, 1000);
         
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
