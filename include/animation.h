@@ -42,7 +42,11 @@ void ascrAnimationStateInit(ASCRanimationState* state);
 ASCRanimationState* ascrAnimationStateTransitionUpdate(
     ASCRanimationState* state,
     ASCRanimationStateTransition* transition);
-	
+
+void ascrFreeASCRanimationClip(ASCRanimationClip* clip);
+void ascrFreeASCRanimationState(ASCRanimationState* state);
+
+
 /**
  * 	Target Usage :
  * 	

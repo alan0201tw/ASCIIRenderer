@@ -20,3 +20,13 @@ ASCRanimationState* ascrAnimationStateTransitionUpdate(
     }
     return state;
 }
+
+void ascrFreeASCRanimationClip(ASCRanimationClip* clip)
+{
+    vec_deinit(&clip->sprites);
+}
+
+void ascrFreeASCRanimationState(ASCRanimationState* state)
+{
+    vec_deinit(&state->transitions);
+}

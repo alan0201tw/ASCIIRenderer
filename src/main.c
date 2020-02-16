@@ -15,6 +15,7 @@
 #include "linmath.h"
 
 #include "common.h"
+#include "memory.h"
 #include "framebuffer.h"
 #include "textsprite.h"
 #include "animation.h"
@@ -47,8 +48,8 @@ void get_uv_by_char(vec4 out_vec4, const stbtt_bakedchar *chardata, const char c
 
 void stbtt_init(void)
 {
-	unsigned char* ttf_buffer = (unsigned char*)malloc((1 << 20) * sizeof(unsigned char));
-	unsigned char* bitmap = (unsigned char*)malloc((512 * 512) * sizeof(unsigned char));
+	unsigned char* ttf_buffer = (unsigned char*)ascrMalloc((1 << 20) * sizeof(unsigned char));
+	unsigned char* bitmap = (unsigned char*)ascrMalloc((512 * 512) * sizeof(unsigned char));
 
     FILE* font_file = fopen("./resources/clacon.ttf", "rb");
     size_t fread_size = fread(ttf_buffer, 1, 1 << 20, font_file);
@@ -63,8 +64,8 @@ void stbtt_init(void)
     // can free temp_bitmap at this point
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	free(ttf_buffer);
-	free(bitmap);
+	ascrFree(ttf_buffer);
+	ascrFree(bitmap);
 }
 
 // this reads the entire frame_buffer and render it on the screen
@@ -175,10 +176,12 @@ int main(int argc, char* argv[])
     // depth
     characterEntity.transform.position[2] =  3.0f;
 
-    ASCRtextSprite* idleSprite = (ASCRtextSprite*) malloc(sizeof(ASCRtextSprite));
-    ascrTextSpriteCreateFromFile(idleSprite, "./resources/texts/humanoid.txt");
-    ASCRtextSprite* walkingSprite = (ASCRtextSprite*) malloc(sizeof(ASCRtextSprite));
-    ascrTextSpriteCreateFromFile(walkingSprite, "./resources/texts/humanoid_walking.txt");
+    // ASCRtextSprite* idleSprite = (ASCRtextSprite*) ascrMalloc(sizeof(ASCRtextSprite));
+    ASCRtextSprite idleSprite;
+    ascrTextSpriteCreateFromFile(&idleSprite, "./resources/texts/humanoid.txt");
+    // ASCRtextSprite* walkingSprite = (ASCRtextSprite*) ascrMalloc(sizeof(ASCRtextSprite));
+    ASCRtextSprite walkingSprite;
+    ascrTextSpriteCreateFromFile(&walkingSprite, "./resources/texts/humanoid_walking.txt");
 
     ASCRanimationState characterIdle, characterWalking;
     ascrAnimationStateInit(&characterIdle);
@@ -189,8 +192,8 @@ int main(int argc, char* argv[])
     ASCRanimationClip idleClip, walkingClip;
     ascrAnimationClipInit(&idleClip);
     ascrAnimationClipInit(&walkingClip);
-    vec_push(&idleClip.sprites, *idleSprite);
-    vec_push(&walkingClip.sprites, *walkingSprite);
+    vec_push(&idleClip.sprites, idleSprite);
+    vec_push(&walkingClip.sprites, walkingSprite);
     	
     characterIdle.clip = idleClip;
     characterWalking.clip = walkingClip;
@@ -210,7 +213,7 @@ int main(int argc, char* argv[])
 
         const float deltaTime = (float)(frameStartTime - previousFrameStartTime) / CLOCKS_PER_SEC;
         previousFrameStartTime = frameStartTime;
-
+        // printf("deltaTime = %f \n", deltaTime);
         // Update
 
         currentState = ascrAnimationStateTransitionUpdate(
@@ -297,6 +300,14 @@ int main(int argc, char* argv[])
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    ascrFreeTextSprite(&idleSprite);
+    ascrFreeTextSprite(&walkingSprite);
+    ascrFreeASCRanimationClip(&idleClip);
+    ascrFreeASCRanimationClip(&walkingClip);
+    ascrFreeASCRanimationState(&characterIdle);
+    ascrFreeASCRanimationState(&characterWalking);
+    printf("allocated memory = %zu bytes \n", ascrGetAllocatedMemory());
 
     return 0;
 }

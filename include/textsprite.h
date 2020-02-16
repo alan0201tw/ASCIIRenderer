@@ -23,3 +23,5 @@ typedef struct ASCRtextSpriteEntity
 
 void ascrTextSpriteCreateFromFile(ASCRtextSprite* textSprite, const char* const file_name);
 void ascrTextSpriteEntityRender(ASCRframeBuffer* const target, const ASCRtextSpriteEntity* const entity);
+
+void ascrFreeTextSprite(ASCRtextSprite* textSprite);

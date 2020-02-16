@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+#include "memory.h"
+
 void ascrTextSpriteCreateFromFile(ASCRtextSprite* textSprite, const char* const file_name)
 {
     FILE* file = fopen(file_name, "r");
@@ -29,17 +31,17 @@ void ascrTextSpriteCreateFromFile(ASCRtextSprite* textSprite, const char* const 
     rowCount += 1;
 
     textSprite->rowCount = rowCount;
-    textSprite->columnCountEachRow = (size_t*)malloc(sizeof(size_t) * rowCount);
+    textSprite->columnCountEachRow = (size_t*)ascrMalloc(sizeof(size_t) * rowCount);
 
     // printf("rowCount = %ld \n", rowCount);
     // printf("text_sprite->rowCount = %ld \n", text_sprite->rowCount);
 
-    textSprite->content = (char**)malloc(sizeof(char*) * rowCount);
+    textSprite->content = (char**)ascrMalloc(sizeof(char*) * rowCount);
     for(size_t rowIdx = 0; rowIdx < rowCount; ++rowIdx)
     {
         // printf("columnCountEachRow[%ld] = %ld \n", rowIdx, columnCountEachRow[rowIdx]);
         textSprite->columnCountEachRow[rowIdx] = columnCountEachRow[rowIdx];
-        textSprite->content[rowIdx] = (char*)malloc(sizeof(char) * columnCountEachRow[rowIdx]);
+        textSprite->content[rowIdx] = (char*)ascrMalloc(sizeof(char) * columnCountEachRow[rowIdx]);
     }
 
     size_t row = 0, col = 0;
@@ -86,3 +88,14 @@ void ascrTextSpriteEntityRender(ASCRframeBuffer* const target, const ASCRtextSpr
         }
     }
 }
+
+void ascrFreeTextSprite(ASCRtextSprite* textSprite)
+{
+    for(size_t rowIdx = 0; rowIdx < textSprite->rowCount; ++rowIdx)
+    {
+        ascrFree(textSprite->content[rowIdx]);
+    }
+    ascrFree(textSprite->content);
+    ascrFree(textSprite->columnCountEachRow);
+}
+

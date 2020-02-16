@@ -110,3 +110,15 @@ typedef struct ASCRtextSpriteEntity
 * Adding timer to State struct to do animation
 
 * States cannot be shared among instances of entity, either enforce this to not happen or at least do some documentation
+
+# Update 0216
+
+* Add text rendering utility for easy UI system
+
+* ASCRanimationState should have a reference to ASCRtextSprite pointer
+    * Add as struct field?
+    * Or pass in as parameter in Update function?
+
+* Use union to represent animatior parameters?
+    * However, if using predicate function, that is not needed
+    * But using a predicate function with no
