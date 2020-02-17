@@ -16,7 +16,7 @@ static ASCRanimationState* ascrAnimationStateTransitionUpdate(
     ASCRanimationState* state,
     ASCRanimationStateTransition* transition)
 {
-    if(transition->predicate() == true)
+    if(transition->predicate != NULL && transition->predicate() == true)
     {
         return transition->targetState;
     }

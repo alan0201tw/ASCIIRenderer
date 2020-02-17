@@ -29,12 +29,12 @@ static int screen_width = 640;
 static int screen_height = 480;
 static float screen_aspect_ratio;
 
+static GLFWwindow* window;
+
 void init()
 {
     screen_aspect_ratio = (float)screen_width / (float)screen_height; // w / h;
 }
-
-static size_t counter = 0;
 
 static void error_callback(int error, const char* description)
 {
@@ -143,12 +143,32 @@ void stbtt_render()
     glEnd();
 }
 
-bool samplePredicate()
+// walking right
+bool idle2WalkingPredicate()
 {
-    counter++;
-    if(counter > 2000)
+    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         return true;
     return false;
+}
+
+bool idle2WalkingLeftPredicate()
+{
+    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        return true;
+    return false;
+}
+
+bool walking2IdlePredicate()
+{
+    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        return false;
+    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        return false;
+    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        return false;
+    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        return false;
+    return true;
 }
 
 int main(int argc, char* argv[])
@@ -157,7 +177,6 @@ int main(int argc, char* argv[])
 
     glfwSetErrorCallback(error_callback);
     
-    GLFWwindow* window;
     if (!glfwInit())
         exit(EXIT_FAILURE);
     
@@ -204,32 +223,71 @@ int main(int argc, char* argv[])
     ascrTextSpriteCreateFromFile(&walkingSprites[0], "./resources/texts/humanoid_walking0.txt");
     ascrTextSpriteCreateFromFile(&walkingSprites[1], "./resources/texts/humanoid_walking1.txt");
 
-    ASCRanimationState characterIdle, characterWalking;
+    ASCRtextSprite walkingLeftSprites[walkingSPriteCount];
+    ascrTextSpriteCreateFromFile(&walkingLeftSprites[0], "./resources/texts/humanoid_walking_left0.txt");
+    ascrTextSpriteCreateFromFile(&walkingLeftSprites[1], "./resources/texts/humanoid_walking_left1.txt");
+
+    ASCRanimationState characterIdle, characterWalking, characterWalkingLeft;
     ascrAnimationStateInit(&characterIdle);
     ascrAnimationStateInit(&characterWalking);
+    ascrAnimationStateInit(&characterWalkingLeft);
 
     ASCRanimationState* currentState = &characterIdle;
 
-    ASCRanimationClip idleClip, walkingClip;
+    ASCRanimationClip idleClip, walkingClip, walkingLeftClip;
     ascrAnimationClipInit(&idleClip);
     ascrAnimationClipInit(&walkingClip);
+    ascrAnimationClipInit(&walkingLeftClip);
     vec_push(&idleClip.sprites, idleSprite);
     for(size_t idx = 0; idx < walkingSPriteCount; ++idx)
     {
         vec_push(&walkingClip.sprites, walkingSprites[idx]);
+        vec_push(&walkingLeftClip.sprites, walkingLeftSprites[idx]);
     }
     	
     characterIdle.clip = idleClip;
     characterWalking.clip = walkingClip;
+    characterWalkingLeft.clip = walkingLeftClip;
     
-    ASCRanimationStateTransition transition;
-    transition.predicate = samplePredicate;
-    transition.targetState = &characterWalking;
+    // idle to walking left and right transition
+    ASCRanimationStateTransition idle2WalkingTransition;
+    idle2WalkingTransition.predicate = idle2WalkingPredicate;
+    idle2WalkingTransition.targetState = &characterWalking;
     
     vec_push(
     	&characterIdle.transitions,
-    	transition
+    	idle2WalkingTransition
     );
+
+    ASCRanimationStateTransition idle2WalkingLeftTransition;
+    idle2WalkingLeftTransition.predicate = idle2WalkingLeftPredicate;
+    idle2WalkingLeftTransition.targetState = &characterWalkingLeft;
+    
+    vec_push(
+    	&characterIdle.transitions,
+    	idle2WalkingLeftTransition
+    );
+    // end of - idle to walking left and right transition
+
+    // walking to idle transition
+    ASCRanimationStateTransition walking2IdleTransition;
+    walking2IdleTransition.predicate = walking2IdlePredicate;
+    walking2IdleTransition.targetState = &characterIdle;
+    
+    vec_push(
+    	&characterWalking.transitions,
+    	walking2IdleTransition
+    );
+
+    ASCRanimationStateTransition walkingLeft2IdleTransition;
+    walkingLeft2IdleTransition.predicate = walking2IdlePredicate;
+    walkingLeft2IdleTransition.targetState = &characterIdle;
+    
+    vec_push(
+    	&characterWalkingLeft.transitions,
+    	walkingLeft2IdleTransition
+    );
+    // end of - walking to idle transition
 
     characterEntity.animatorState = currentState;
 
