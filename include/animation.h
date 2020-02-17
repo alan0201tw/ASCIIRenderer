@@ -16,6 +16,10 @@ typedef vec_t(ASCRtextSprite) ASCRtextSpriteVector;
 typedef struct ASCRanimationClip
 {
 	ASCRtextSpriteVector sprites;
+	// the time interval between sprites is determined by the size 
+	// of the sprites and frameRate, currently all sprites are neighbor frames
+	// Keyframe utility should be added for a more sophisticated animation system
+	float timeToNextSprite;
 
 } ASCRanimationClip;
 
@@ -34,14 +38,18 @@ typedef struct ASCRanimationState
 	ASCRanimationClip clip;
 	ASCRanimationStateTransitionVector transitions;
 
+	float accumulationTimer;
+
 } ASCRanimationState;
 
 void ascrAnimationClipInit(ASCRanimationClip* clip);
 void ascrAnimationStateInit(ASCRanimationState* state);
 
-ASCRanimationState* ascrAnimationStateTransitionUpdate(
-    ASCRanimationState* state,
-    ASCRanimationStateTransition* transition);
+// ASCRanimationState* ascrAnimationStateTransitionUpdate(
+//     ASCRanimationState* state,
+//     ASCRanimationStateTransition* transition);
+
+ASCRanimationState* ascrAnimationStateUpdate(ASCRanimationState* state);
 
 void ascrFreeASCRanimationClip(ASCRanimationClip* clip);
 void ascrFreeASCRanimationState(ASCRanimationState* state);

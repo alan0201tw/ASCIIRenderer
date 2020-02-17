@@ -146,7 +146,7 @@ void stbtt_render()
 bool samplePredicate()
 {
     counter++;
-    if(counter > 200)
+    if(counter > 2000)
         return true;
     return false;
 }
@@ -199,8 +199,10 @@ int main(int argc, char* argv[])
     ASCRtextSprite idleSprite;
     ascrTextSpriteCreateFromFile(&idleSprite, "./resources/texts/humanoid.txt");
     // ASCRtextSprite* walkingSprite = (ASCRtextSprite*) ascrMalloc(sizeof(ASCRtextSprite));
-    ASCRtextSprite walkingSprite;
-    ascrTextSpriteCreateFromFile(&walkingSprite, "./resources/texts/humanoid_walking.txt");
+    const size_t walkingSPriteCount = 2;
+    ASCRtextSprite walkingSprites[walkingSPriteCount];
+    ascrTextSpriteCreateFromFile(&walkingSprites[0], "./resources/texts/humanoid_walking0.txt");
+    ascrTextSpriteCreateFromFile(&walkingSprites[1], "./resources/texts/humanoid_walking1.txt");
 
     ASCRanimationState characterIdle, characterWalking;
     ascrAnimationStateInit(&characterIdle);
@@ -212,7 +214,10 @@ int main(int argc, char* argv[])
     ascrAnimationClipInit(&idleClip);
     ascrAnimationClipInit(&walkingClip);
     vec_push(&idleClip.sprites, idleSprite);
-    vec_push(&walkingClip.sprites, walkingSprite);
+    for(size_t idx = 0; idx < walkingSPriteCount; ++idx)
+    {
+        vec_push(&walkingClip.sprites, walkingSprites[idx]);
+    }
     	
     characterIdle.clip = idleClip;
     characterWalking.clip = walkingClip;
@@ -225,6 +230,8 @@ int main(int argc, char* argv[])
     	&characterIdle.transitions,
     	transition
     );
+
+    characterEntity.animatorState = currentState;
 
     while (!glfwWindowShouldClose(window))
     {
@@ -242,20 +249,10 @@ int main(int argc, char* argv[])
         previousFrameStartTime = frameStartTime;
 
         // Update
-        currentState = ascrAnimationStateTransitionUpdate(
-            currentState,
-            &transition
+        ascrTextSpriteEntityUpdate(
+            &characterEntity,
+            deltaTime
         );
-
-        if(currentState == &characterIdle)
-        {
-            // printf("currentState == &characterIdle \n");
-        }
-        else if(currentState == &characterWalking)
-        {
-            // printf("currentState == &characterWalking \n");
-        }
-        characterEntity.textSprite = &(currentState->clip.sprites.data[0]);
         //
         char sampleText[32];
         sprintf(sampleText, "FPS = %f", 1.0f / deltaTime);
@@ -339,7 +336,10 @@ int main(int argc, char* argv[])
     }
 
     ascrFreeTextSprite(&idleSprite);
-    ascrFreeTextSprite(&walkingSprite);
+    for(size_t idx = 0; idx < walkingSPriteCount; ++idx)
+    {
+        ascrFreeTextSprite(&walkingSprites[idx]);
+    }
     ascrFreeASCRanimationClip(&idleClip);
     ascrFreeASCRanimationClip(&walkingClip);
     ascrFreeASCRanimationState(&characterIdle);

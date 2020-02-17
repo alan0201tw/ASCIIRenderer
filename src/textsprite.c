@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "memory.h"
+#include "animation.h"
 
 void ascrTextSpriteCreateFromFile(ASCRtextSprite* textSprite, const char* const file_name)
 {
@@ -87,6 +88,30 @@ void ascrTextSpriteEntityRender(ASCRframeBuffer* const target, const ASCRtextSpr
                 );
         }
     }
+}
+
+void ascrTextSpriteEntityUpdate(ASCRtextSpriteEntity* entity, float deltaTime)
+{
+    ASCRanimationState* nextState = 
+        ascrAnimationStateUpdate(entity->animatorState);
+    
+    // if there is a valid transition, reset the timer on each state
+    if(entity->animatorState != nextState)
+    {
+        entity->animatorState->accumulationTimer = 0.0f;
+        nextState->accumulationTimer = 0.0f;
+    }
+
+    entity->animatorState = nextState;
+    entity->animatorState->accumulationTimer += deltaTime;
+
+    size_t spriteIdx = 
+        entity->animatorState->accumulationTimer / 
+        entity->animatorState->clip.timeToNextSprite;
+
+    spriteIdx %= entity->animatorState->clip.sprites.length;
+    
+    entity->textSprite = &(entity->animatorState->clip.sprites.data[spriteIdx]);
 }
 
 void ascrFreeTextSprite(ASCRtextSprite* textSprite)
