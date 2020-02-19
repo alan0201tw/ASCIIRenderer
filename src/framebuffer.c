@@ -22,8 +22,8 @@ void ascrFrameBufferClear(ASCRframeBuffer* fb)
 void ascrFrameBufferWriteChar(ASCRframeBuffer* fb, size_t x, size_t y, float depth, vec3 color, char pixel)
 {
     // Do transformation to camera space
-    x = x - (size_t)fb->center[0];
-    y = y - (size_t)fb->center[1];
+    x = x - (size_t)(fb->center[0]) + FRAME_BUFFER_WIDTH / 2;
+    y = y - (size_t)(fb->center[1]) + FRAME_BUFFER_HEIGHT / 2;
 
     // view culling
     if(x < 0 || x >= FRAME_BUFFER_WIDTH || y < 0 || y >= FRAME_BUFFER_HEIGHT)
@@ -42,10 +42,23 @@ void ascrFrameBufferWriteChar(ASCRframeBuffer* fb, size_t x, size_t y, float dep
     fb->depth_value[x][y] = depth;
 }
 
+void ascrFrameBufferWriteString(ASCRframeBuffer* fb, size_t x, size_t y, float depth, vec3 color, char* pixels)
+{
+    for(size_t idx = 0; idx < strlen(pixels); ++idx)
+    {
+        ascrFrameBufferWriteChar(
+            fb, x + idx, y, depth, color, pixels[idx]
+        );
+    }
+}
+
 void ascrFrameBufferWriteCharScreenSpace(ASCRframeBuffer* fb, size_t x, size_t y, float depth, vec3 color, char pixel)
 {
     ascrFrameBufferWriteChar(
-        fb, x + fb->center[0], y + fb->center[1], depth, color, pixel
+        fb, 
+        x + fb->center[0] - FRAME_BUFFER_WIDTH / 2,
+        y + fb->center[1] - FRAME_BUFFER_HEIGHT / 2, 
+        depth, color, pixel
     );
 }
 

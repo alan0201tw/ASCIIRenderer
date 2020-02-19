@@ -146,14 +146,20 @@ void stbtt_render()
 // walking right
 bool idle2WalkingPredicate()
 {
-    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    if(
+        glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && 
+        glfwGetKey(window, GLFW_KEY_A) == GLFW_RELEASE
+    )
         return true;
     return false;
 }
 
 bool idle2WalkingLeftPredicate()
 {
-    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    if(
+        glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && 
+        glfwGetKey(window, GLFW_KEY_D) == GLFW_RELEASE
+    )
         return true;
     return false;
 }
@@ -161,13 +167,24 @@ bool idle2WalkingLeftPredicate()
 bool walking2IdlePredicate()
 {
     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        // if both key is pressed, back to idle
+        if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            return true;
         return false;
+    }
+    return true;
+}
+
+bool walkingLeft2IdlePredicate()
+{
     if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        // if both key is pressed, back to idle
+        if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            return true;
         return false;
-    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        return false;
-    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        return false;
+    }
     return true;
 }
 
@@ -212,7 +229,7 @@ int main(int argc, char* argv[])
     characterEntity.transform.position[0] = 10.0f;
     characterEntity.transform.position[1] =  9.0f;
     // depth
-    characterEntity.transform.position[2] =  3.0f;
+    characterEntity.transform.position[2] =  4.0f;
 
     // ASCRtextSprite* idleSprite = (ASCRtextSprite*) ascrMalloc(sizeof(ASCRtextSprite));
     ASCRtextSprite idleSprite;
@@ -280,7 +297,7 @@ int main(int argc, char* argv[])
     );
 
     ASCRanimationStateTransition walkingLeft2IdleTransition;
-    walkingLeft2IdleTransition.predicate = walking2IdlePredicate;
+    walkingLeft2IdleTransition.predicate = walkingLeft2IdlePredicate;
     walkingLeft2IdleTransition.targetState = &characterIdle;
     
     vec_push(
@@ -316,19 +333,26 @@ int main(int argc, char* argv[])
         sprintf(sampleText, "FPS = %f", 1.0f / deltaTime);
         vec3 white = {1.0f, 1.0f, 1.0f};
         ascrFrameBufferWriteStringScreenSpace(
-            &frameBuffer, 0, 0, 5, white, sampleText
+            &frameBuffer, 0, 0, 3, white, sampleText
         );
         sprintf(sampleText, "dT = %f", deltaTime);
         ascrFrameBufferWriteStringScreenSpace(
-            &frameBuffer, 0, 1, 5, white, sampleText
+            &frameBuffer, 0, 2, 3, white, sampleText
         );
 
-        for(size_t idx = 0; idx < 10; ++idx)
-        {
-            vec3 col = {(float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX};
+        char roadText[FRAME_BUFFER_WIDTH];
+        for(size_t idx = 0; idx < FRAME_BUFFER_WIDTH; ++idx)
+            roadText[idx] = '_';
+        ascrFrameBufferWriteString(
+            &frameBuffer, 0, 8, 5, white, roadText
+        );
 
-            ascrFrameBufferWriteChar(&frameBuffer, rand()%50, rand()%50, 5, col, 'a');
-        }
+        // for(size_t idx = 0; idx < 10; ++idx)
+        // {
+        //     vec3 col = {(float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX};
+
+        //     ascrFrameBufferWriteChar(&frameBuffer, rand()%50, rand()%50, 5, col, 'a');
+        // }
 
         const float velocity = 10.0f;
 
@@ -336,14 +360,12 @@ int main(int argc, char* argv[])
             characterEntity.transform.position[0] += deltaTime * velocity;
         if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
             characterEntity.transform.position[0] += deltaTime * -1 * velocity;
+
         if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
             characterEntity.transform.position[1] += deltaTime * velocity;
         if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
             characterEntity.transform.position[1] += deltaTime * -1 * velocity;
 
-        // printf("deltaTime = %lf \n", deltaTime);
-
-        // render_humanoid(&frame_buffer, &mainCharacter);
         ascrTextSpriteEntityRender(&frameBuffer, &characterEntity);
 
         int width, height;
@@ -381,6 +403,13 @@ int main(int argc, char* argv[])
             frameBuffer.center[0] += deltaTime * velocity;
         if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
             frameBuffer.center[1] += deltaTime * velocity;
+
+        frameBuffer.center[0] = characterEntity.transform.position[0];
+        frameBuffer.center[1] = characterEntity.transform.position[1];
+
+        frameBuffer.color_value[0][0][0] = 1.0f;
+        frameBuffer.color_value[0][0][1] = 0.0f;
+        frameBuffer.color_value[0][0][2] = 0.0f;
 
         glPushMatrix();
         {
